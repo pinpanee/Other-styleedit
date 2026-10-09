@@ -117,6 +117,15 @@ main{max-width:640px;margin:0 auto;padding:8px 12px 56px;position:relative}
 .hdr-r .header-appt{position:absolute;right:0;top:100%}
 #gate .g-err{min-height:16px;font-size:11px;color:#ff6b6b;margin-top:10px}
 html.lock,html.lock body{overflow:hidden}
+#bnr{position:relative;overflow:hidden;align-items:center}
+#bnr .sweep{position:absolute;left:0;bottom:0;height:2px;width:35%;background:linear-gradient(90deg,transparent,var(--electric),transparent);box-shadow:0 0 10px var(--electric-glow);animation:sweep 1.2s ease-in-out infinite}
+#bnr:not(.sending) .sweep,#bnr:not(.sending) .dots{display:none}
+@keyframes sweep{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.dots i{font-style:normal;opacity:.2;animation:dot 1.2s infinite}.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,60%,100%{opacity:.2}30%{opacity:1}}
+#bnr.failed .confirm-banner-icon{background:#ff6b6b;box-shadow:none}
 </style>
 </head>
 <body>
@@ -181,7 +190,7 @@ else if(f.t==='refs')h+=`<div class="f-field"><label class="f-lbl q"><span class
 else if(f.t==='area')h+=`<div class="f-field"><label class="f-lbl${f.q?' q':''}" for="${f.k}">${f.q?'<span class="qn">'+(++qn)+'/</span>':''}${f.b?esc(f.l).replace(esc(f.b),'<b>'+esc(f.b)+'</b>'):esc(f.l)}</label><textarea class="f-ta" rows="1" id="${f.k}" data-k="${f.k}">${esc(v||'')}</textarea>${f.img?`<div class="refs" id="refs-${f.k}_img" style="margin-top:4px">${refsHTML(f.k+'_img',d[f.k+'_img'])}</div><input type="file" id="file-${f.k}_img" accept="image/*" multiple hidden>`:''}</div>`;
 else{const m=f.t==='multi';h+=`<div class="f-field"><div class="f-lbl">${esc(f.l)}</div><div class="menu-panel">`+f.o.map(o=>{const on=m?(v||[]).includes(o):v===o;return `<label class="svc-row ${on?'sel':''}"><input type="${m?'checkbox':'radio'}" name="${f.k}" data-k="${f.k}" value="${esc(o)}" ${on?'checked':''}><span class="svc-check"></span><span class="svc-name">${esc(o)}</span></label>`}).join('')+`</div></div>`}
 });h+=`</div>`});
-h+=`<button class="btn-book" id="go" disabled>Submit</button><div id="out"></div>`;
+h+=`<button class="btn-book" id="go" disabled>Submit &amp; Logout</button><div id="out"></div>`;
 $('#app').innerHTML=h;document.querySelectorAll('.f-ta').forEach(grow);progress();
 }
 document.addEventListener('click',e=>{if(e.target.id==='go')finish();
@@ -193,7 +202,7 @@ if(el.tagName==='TEXTAREA')grow(el);
 if(el.type==='checkbox')d[k]=[...document.querySelectorAll(`input[name="${k}"]:checked`)].map(x=>x.value);else d[k]=el.value;
 if(el.type==='checkbox'||el.type==='radio')document.querySelectorAll(`input[name="${k}"]`).forEach(x=>x.closest('.svc-row').classList.toggle('sel',x.checked));
 progress();clearTimeout(tmr);tmr=setTimeout(save,400)});
-function rows(){const d=st.d[st.form];return FORMS[st.form].s.map(([t,fs])=>[t,fs.map(f=>{const tri=f.ks?f.ks.map((k,i)=>d[k]&&d[k].trim()?f.ns[i]+' '+d[k].trim():'').filter(Boolean).join(' / '):'',im=f.img?(d[f.k+'_img']||[]).length:0,v=d[f.k],s0=f.ks?tri:f.t==='refs'?((v||[]).length?(v.length+' image'+(v.length>1?'s':'')+' (sent separately)'):''):Array.isArray(v)?v.join(', '):(v||'').trim(),s=[s0,im?im+' image'+(im>1?'s':'')+' (sent separately)':''].filter(Boolean).join('\n');return s?[f.l,s]:null}).filter(Boolean)]).filter(x=>x[1].length)}
+function rows(){const d=st.d[st.form];let qn=0;return FORMS[st.form].s.map(([t,fs])=>[t,fs.map(f=>{const num=f.q?(++qn)+'/ ':'',tri=f.ks?f.ks.map((k,i)=>d[k]&&d[k].trim()?f.ns[i]+' '+d[k].trim():'').filter(Boolean).join(' / '):'',im=f.img?(d[f.k+'_img']||[]).length:0,v=d[f.k],s0=f.ks?tri:f.t==='refs'?((v||[]).length?(v.length+' image'+(v.length>1?'s':'')+' (sent separately)'):''):Array.isArray(v)?v.join(', '):(v||'').trim(),s=[s0,im?im+' image'+(im>1?'s':'')+' (sent separately)':''].filter(Boolean).join('\n');return s?[num+f.l,s]:null}).filter(Boolean)]).filter(x=>x[1].length)}
 function summary(){return `OTHER___0.01 — ${FORMS[st.form].name} questionnaire\n`+rows().map(([t,r])=>`\n[${t}]\n`+r.map(x=>x.join(': ')).join('\n')).join('\n')+'\n'}
 const EMAIL_TO='other0.01contact@gmail.com',EMAIL_SERVICE='service_other001',EMAIL_TEMPLATE='template_a2ms1lr';
 (function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';s.onload=function(){try{emailjs.init('NiBoQ_1Z2sNTVK1Jb')}catch(e){}};document.head.appendChild(s)})();
@@ -201,11 +210,12 @@ const IMGBB_KEY='8c16ed45c3088d72abfec153130bcc8d';
 function dataBlob(u){const p=u.split(','),m=/data:([^;]+)/.exec(p[0]),b=atob(p[1]),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return new Blob([a],{type:m?m[1]:'image/jpeg'})}
 function upOne(src,name,pg){return new Promise((res,rej)=>{const f=new FormData();f.append('key',IMGBB_KEY);f.append('image',dataBlob(src),name);const x=new XMLHttpRequest();x.open('POST','https://api.imgbb.com/1/upload');x.upload.onprogress=e=>{if(pg&&e.lengthComputable)pg(e.loaded/e.total)};x.timeout=30000;x.onload=()=>{try{const d=JSON.parse(x.responseText);d&&d.success?res(d.data.url):rej(new Error('rejected'))}catch(e){rej(e)}};x.onerror=()=>rej(new Error('network'));x.ontimeout=()=>rej(new Error('timeout'));x.send(f)})}
 async function upRetry(src,name,pg){try{return await upOne(src,name,pg)}catch(e){if(pg)pg(0);return await upOne(src,name,pg)}}
-function photoList(){const d=st.d[st.form],out=[];FORMS[st.form].s.forEach(([t,fs])=>fs.forEach(f=>{const k=f.t==='refs'?f.k:f.img?f.k+'_img':null;if(!k)return;(d[k]||[]).forEach(x=>out.push({label:f.l.replace(/\n/g,' '),src:x.src}))}));return out}
+function photoList(){const d=st.d[st.form],out=[];let qn=0;FORMS[st.form].s.forEach(([t,fs])=>fs.forEach(f=>{const num=f.q?(++qn)+'/ ':'';const k=f.t==='refs'?f.k:f.img?f.k+'_img':null;if(!k)return;(d[k]||[]).forEach(x=>out.push({label:num+f.l.replace(/\n/g,' '),src:x.src}))}));return out}
 let lastSent='',busy=false,cur='';
-const setS=t=>{cur=t;const e=$('#esend');if(e)e.textContent=t};
+const setB=t=>{const b=$('#bnr');if(!b)return;const ok=t.startsWith('✓ Answers sent'),fail=t.startsWith('Could not send');if(!ok&&!fail)return;b.classList.remove('sending');b.classList.toggle('failed',fail);$('#bico').textContent=ok?'✓':'!';$('#btt').textContent=ok?'Answers sent':'Not sent';$('#bsub').textContent=ok?'Thank you — logging out…':'Please check your connection and tap Submit again.'};
+const setS=t=>{cur=t;const e=$('#esend');if(e)e.textContent=t;setB(t)};
 async function sendAnswers(s){
-const fail='Could not send automatically — please use Copy answers or Send via LINE below.';
+const fail='Could not send — please check your connection and tap Submit again.';
 if(busy){setS(cur);return}
 const ph=photoList(),sig=s+'|'+ph.map(p=>p.src.length).join(',');
 if(sig===lastSent){setS('✓ Answers sent');return}
@@ -225,11 +235,11 @@ const u=urls[i];html+=u?`<p><a href="${u}" target="_blank"><img src="${u}" style
 if(bad)html+='<p>⚠️ '+bad+' of '+ph.length+' photo(s) failed to upload — ask the client to send them on Instagram.</p>'}
 setS('Sending your answers…');
 await emailjs.send(EMAIL_SERVICE,EMAIL_TEMPLATE,{to_email:EMAIL_TO,subject:'Style Edit questionnaire — DENISE',client_name:'DENISE',message:s.replace(/\(sent separately\)/g,'(see photos below)'),images_html:html});
-lastSent=sig;setS(bad?'✓ Answers sent — '+bad+' photo(s) could not upload, please send them on Instagram.':'✓ Answers sent');
+lastSent=sig;setS(bad?'✓ Answers sent — '+bad+' photo(s) could not upload, please send them on Instagram.':'✓ Answers sent');setTimeout(()=>{clearTimeout(tmr);try{localStorage.removeItem('other-gate-v1');localStorage.removeItem(KEY)}catch(e){}location.reload()},bad?10000:3000);
 }catch(e){setS(fail+' ['+(((e&&e.status)||'')+' '+((e&&(e.text||e.message))||'')).trim()+']')}
 finally{busy=false;window.removeEventListener('beforeunload',warn)}}
 function finish(){const s=summary();
-$('#out').innerHTML=`<div style="margin-top:34px"><div class="sec-eyebrow">Review &amp; send</div><div class="cmsg" id="esend" style="text-align:left;margin:0 0 10px"></div><div id="upbar" hidden><div class="uptrack"><div id="upfill"></div></div><div id="uppct">0%</div></div><div class="confirm-banner"><div class="confirm-banner-icon">✓</div><div><div class="confirm-banner-title">Ready to send</div><div class="confirm-banner-sub">Tap copy and paste into LINE or Instagram DM, or send straight from LINE.</div></div></div><div class="confirm-summary">`+rows().map(([t,r])=>`<div class="m-sec">${esc(t)}</div>`+r.map(([a,b])=>`<div class="m-row"><span>${esc(a)}</span><span>${esc(b)}</span></div>`).join('')).join('')+`</div><pre id="sum" hidden>${esc(s)}</pre><button class="btn-book" id="copy">Copy answers</button><a class="btn-alt" href="https://line.me/R/msg/text/?${encodeURIComponent(s)}" target="_blank" rel="noopener">Send via LINE</a><div class="cmsg" id="cmsg"></div></div>`;
+$('#out').innerHTML=`<div style="margin-top:34px"><div class="sec-eyebrow">Review &amp; send</div><div class="cmsg" id="esend" style="text-align:left;margin:0 0 10px"></div><div id="upbar" hidden><div class="uptrack"><div id="upfill"></div></div><div id="uppct">0%</div></div><div class="confirm-banner sending" id="bnr"><div class="confirm-banner-icon" id="bico"><span class="spin"></span></div><div><div class="confirm-banner-title" id="btt">Sending your answers<span class="dots"><i>.</i><i>.</i><i>.</i></span></div><div class="confirm-banner-sub" id="bsub">Please keep this page open until it confirms.</div></div><span class="sweep"></span></div><pre id="sum" hidden>${esc(s)}</pre></div>`;
 sendAnswers(s);$('#out').scrollIntoView({behavior:'smooth'})}
 async function copyOut(){const s=$('#sum').textContent;try{await navigator.clipboard.writeText(s);$('#cmsg').textContent='Copied ✓'}catch(e){const t=document.createElement('textarea');t.value=s;t.style.cssText='position:fixed;opacity:0';document.body.appendChild(t);t.select();let ok=false;try{ok=document.execCommand('copy')}catch(x){}t.remove();$('#cmsg').textContent=ok?'Copied ✓':'Could not copy — use Send via LINE instead.'}}
 function hasData(){return Object.values(st.d[st.form]).some(filled)}
