@@ -195,7 +195,7 @@ if(el.type==='checkbox'||el.type==='radio')document.querySelectorAll(`input[name
 progress();clearTimeout(tmr);tmr=setTimeout(save,400)});
 function rows(){const d=st.d[st.form];return FORMS[st.form].s.map(([t,fs])=>[t,fs.map(f=>{const tri=f.ks?f.ks.map((k,i)=>d[k]&&d[k].trim()?f.ns[i]+' '+d[k].trim():'').filter(Boolean).join(' / '):'',im=f.img?(d[f.k+'_img']||[]).length:0,v=d[f.k],s0=f.ks?tri:f.t==='refs'?((v||[]).length?(v.length+' image'+(v.length>1?'s':'')+' (sent separately)'):''):Array.isArray(v)?v.join(', '):(v||'').trim(),s=[s0,im?im+' image'+(im>1?'s':'')+' (sent separately)':''].filter(Boolean).join('\n');return s?[f.l,s]:null}).filter(Boolean)]).filter(x=>x[1].length)}
 function summary(){return `OTHER___0.01 — ${FORMS[st.form].name} questionnaire\n`+rows().map(([t,r])=>`\n[${t}]\n`+r.map(x=>x.join(': ')).join('\n')).join('\n')+'\n'}
-const EMAIL_TO='other0.01contact@gmail.com',EMAIL_SERVICE='service_other001',EMAIL_TEMPLATE='template_questionnaire';
+const EMAIL_TO='other0.01contact@gmail.com',EMAIL_SERVICE='service_other001',EMAIL_TEMPLATE='template_a2ms1lr';
 (function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';s.onload=function(){try{emailjs.init('NiBoQ_1Z2sNTVK1Jb')}catch(e){}};document.head.appendChild(s)})();
 const IMGBB_KEY='8c16ed45c3088d72abfec153130bcc8d';
 function dataBlob(u){const p=u.split(','),m=/data:([^;]+)/.exec(p[0]),b=atob(p[1]),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return new Blob([a],{type:m?m[1]:'image/jpeg'})}
@@ -209,7 +209,7 @@ const fail='Could not send automatically — please use Copy answers or Send via
 if(busy){setS(cur);return}
 const ph=photoList(),sig=s+'|'+ph.map(p=>p.src.length).join(',');
 if(sig===lastSent){setS('✓ Answers sent');return}
-if(typeof emailjs==='undefined'){setS(fail);return}
+if(typeof emailjs==='undefined'){setS(fail+' [EmailJS did not load]');return}
 busy=true;const warn=e=>{e.preventDefault();e.returnValue=''};
 try{
 let html='None',bad=0;
@@ -226,7 +226,7 @@ if(bad)html+='<p>⚠️ '+bad+' of '+ph.length+' photo(s) failed to upload — a
 setS('Sending your answers…');
 await emailjs.send(EMAIL_SERVICE,EMAIL_TEMPLATE,{to_email:EMAIL_TO,subject:'Style Edit questionnaire — DENISE',client_name:'DENISE',message:s.replace(/\(sent separately\)/g,'(see photos below)'),images_html:html});
 lastSent=sig;setS(bad?'✓ Answers sent — '+bad+' photo(s) could not upload, please send them on Instagram.':'✓ Answers sent');
-}catch(e){setS(fail)}
+}catch(e){setS(fail+' ['+(((e&&e.status)||'')+' '+((e&&(e.text||e.message))||'')).trim()+']')}
 finally{busy=false;window.removeEventListener('beforeunload',warn)}}
 function finish(){const s=summary();
 $('#out').innerHTML=`<div style="margin-top:34px"><div class="sec-eyebrow">Review &amp; send</div><div class="cmsg" id="esend" style="text-align:left;margin:0 0 10px"></div><div id="upbar" hidden><div class="uptrack"><div id="upfill"></div></div><div id="uppct">0%</div></div><div class="confirm-banner"><div class="confirm-banner-icon">✓</div><div><div class="confirm-banner-title">Ready to send</div><div class="confirm-banner-sub">Tap copy and paste into LINE or Instagram DM, or send straight from LINE.</div></div></div><div class="confirm-summary">`+rows().map(([t,r])=>`<div class="m-sec">${esc(t)}</div>`+r.map(([a,b])=>`<div class="m-row"><span>${esc(a)}</span><span>${esc(b)}</span></div>`).join('')).join('')+`</div><pre id="sum" hidden>${esc(s)}</pre><button class="btn-book" id="copy">Copy answers</button><a class="btn-alt" href="https://line.me/R/msg/text/?${encodeURIComponent(s)}" target="_blank" rel="noopener">Send via LINE</a><div class="cmsg" id="cmsg"></div></div>`;
