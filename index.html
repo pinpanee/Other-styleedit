@@ -119,6 +119,7 @@ html.lock,html.lock body{overflow:hidden}
 #bnr{position:relative;overflow:hidden;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}
 #bnr .bhead{display:flex;align-items:center;justify-content:center;gap:10px}
 #bnr .confirm-banner-title{margin-bottom:0}
+#bnr .confirm-banner-sub{white-space:nowrap;font-size:min(10px,calc((100vw - 68px)/30))}
 #bnr:not(.sending) .dots{display:none}
 .spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -232,7 +233,8 @@ ph.forEach((p,i)=>{if(p.label!==last){html+='<p><b>'+esc(p.label)+'</b></p>';las
 const u=urls[i];html+=u?`<p><a href="${u}" target="_blank"><img src="${u}" style="max-width:400px;max-height:400px;display:block;margin:6px 0"></a><a href="${u}" target="_blank">Open full size</a></p>`:'<p>⚠️ This photo failed to upload.</p>'});
 if(bad)html+='<p>⚠️ '+bad+' of '+ph.length+' photo(s) failed to upload — ask the client to send them on Instagram.</p>'}
 setS('Sending your answers…');
-await emailjs.send(EMAIL_SERVICE,EMAIL_TEMPLATE,{to_email:EMAIL_TO,subject:'Style Edit questionnaire — DENISE',client_name:'DENISE',message:s.replace(/\(sent separately\)/g,'(see photos below)'),images_html:html});
+const fx=t=>esc(t.replace(/\(sent separately\)/g,'(see photos below)')).replace(/\n/g,'<br>'),ah=rows().map(([t,r])=>'<p style="margin:18px 0 8px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#0a6fff"><b>'+esc(t)+'</b></p>'+r.map(([q,v])=>'<p style="margin:0 0 12px">'+fx(q)+'<br><b>'+fx(v)+'</b></p>').join('')).join('');
+await emailjs.send(EMAIL_SERVICE,EMAIL_TEMPLATE,{to_email:EMAIL_TO,subject:'Style Edit questionnaire — DENISE',client_name:'DENISE',message:'',message_html:ah,images_html:ah+(html==='None'?'':html)});
 lastSent=sig;setS(bad?'✓ Answers sent — '+bad+' photo(s) could not upload, please send them on Instagram.':'✓ Answers sent');setTimeout(()=>{clearTimeout(tmr);try{localStorage.removeItem('other-gate-v1');localStorage.removeItem(KEY)}catch(e){}location.reload()},bad?10000:3000);
 }catch(e){setS(fail+' ['+(((e&&e.status)||'')+' '+((e&&(e.text||e.message))||'')).trim()+']')}
 finally{busy=false;window.removeEventListener('beforeunload',warn)}}
